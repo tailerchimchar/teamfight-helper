@@ -3,8 +3,8 @@ import cv2 as cv
 import numpy as np
 import vlc
 from sys import platform as PLATFORM
-
-
+import programhelper
+import mp4class
 
 psg.theme('darkgray12')
 psg.set_options(font=("Arial Bold", 14))
@@ -12,20 +12,10 @@ colors = (psg.theme_background_color(), psg.theme_background_color())
 
 #display(IFrame(r'C:\Medal\Clips\League of Legends\MedalTVLeagueofLegends20230417154836.mp4', '100%', '600px'))
 
-def blank_frame():
-    return psg.Frame("", [[]], pad=(5, 3), expand_x=True, expand_y=True, background_color='#404040', border_width=0)\
-
-def btn(name):  # a PySimpleGUI "User Defined Element" (see docs)
-  return psg.Button(name, size=(6, 1), pad=(1, 1))
-
-layout_frame1 = [
-  [blank_frame()]
-]
-
 layout = [
   [psg.Input(default_text='Video URL or Local Path (no quotes):', size=(30, 1), key='-VIDEO_LOCATION-'), psg.Button('load')],
   [psg.Image('', size=(300, 170), key='-VID_OUT-')],
-  [btn('previous'), btn('play'), btn('next'), btn('pause'), btn('stop')],
+  [programhelper.btn('previous'), programhelper.btn('play'), programhelper.btn('next'), programhelper.btn('pause'), programhelper.btn('stop')],
   [psg.Text('Load media to start', key='-MESSAGE_AREA-')]
 ]
 
@@ -34,17 +24,6 @@ window['-VID_OUT-'].expand(True, True)                # type: sg.Element
 
 
 #window = psg.Window('Form', layout, size=(715,400))
-
-class Video(object):
-    def __init__(self,path):
-        self.path = path
-
-    def play(self):
-        from os import startfile
-        startfile(self.path)
-
-class Movie_MP4(Video):
-    type = "MP4"
 
 inst = vlc.Instance()
 list_player = inst.media_list_player_new()
