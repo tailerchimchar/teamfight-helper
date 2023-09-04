@@ -68,7 +68,7 @@ while True:
   else:
     window['-MESSAGE_AREA-'].update('Load media to start' if media_list.count() == 0 else 'Ready to play media' )
  
-  cap = cv.VideoCapture(r"C:\Medal\Clips\League of Legends\MedalTVLeagueofLegends20230417154836.mp4")
+  cap = cv.VideoCapture(r"C:\Users\Tailer\source\repos\teamfight-helper\clips\clip1.mp4")
   if (cap.isOpened()== False): 
     print("didn't open")
     break
