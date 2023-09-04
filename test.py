@@ -1,18 +1,29 @@
-import PySimpleGUI as sg
+import PySimpleGUI as psg
+import cv2 as cv
+import numpy as np
 import vlc
 from sys import platform as PLATFORM
+import programhelper
+import mp4class
 
-def btn(name):  # a PySimpleGUI "User Defined Element" (see docs)
-    return sg.Button(name, size=(6, 1), pad=(1, 1))
+psg.theme('darkgray12')
+psg.set_options(font=("Arial Bold", 14))
+colors = (psg.theme_background_color(), psg.theme_background_color())
 
-layout = [[sg.Input(default_text='Video URL or Local Path:', size=(30, 1), key='-VIDEO_LOCATION-'), sg.Button('load')],
-          [sg.Image('', size=(300, 170), key='-VID_OUT-')],
-          [btn('previous'), btn('play'), btn('next'), btn('pause'), btn('stop')],
-          [sg.Text('Load media to start', key='-MESSAGE_AREA-')]]
+#display(IFrame(r'C:\Medal\Clips\League of Legends\MedalTVLeagueofLegends20230417154836.mp4', '100%', '600px'))
 
-window = sg.Window('Mini Player', layout, element_justification='center', finalize=True, resizable=True)
+layout = [
+  [psg.Input(default_text='Video URL or Local Path (no quotes):', size=(30, 1), key='-VIDEO_LOCATION-'), psg.Button('load')],
+  [psg.Image('', size=(300, 170), key='-VID_OUT-')],
+  [programhelper.btn('previous'), programhelper.btn('play'), programhelper.btn('next'), programhelper.btn('pause'), programhelper.btn('stop')],
+  [psg.Text('Load media to start', key='-MESSAGE_AREA-')]
+]
 
+window = psg.Window('Mini Player', layout, element_justification='center', finalize=True, resizable=True)
 window['-VID_OUT-'].expand(True, True)                # type: sg.Element
+
+
+#window = psg.Window('Form', layout, size=(715,400))
 
 inst = vlc.Instance()
 list_player = inst.media_list_player_new()
@@ -26,8 +37,10 @@ else:
 
 
 while True:
-  event, values = window.read(timeout=1000)       # run with a timeout so that current location can be updated
-  if event == sg.WIN_CLOSED:
+  event, values = window.read(timeout=1000)
+  print (event, values)
+
+  if event == psg.WIN_CLOSED:
      break
   if event == 'play':
         list_player.play()
@@ -48,12 +61,20 @@ while True:
         list_player.set_media_list(media_list)
         window['-VIDEO_LOCATION-'].update('Video URL or Local Path:') # only add a legit submit
 
+    # update elapsed time if there is a video loaded and the player is playing
+  if player.is_playing():
+    print('is playing')
+    window['-MESSAGE_AREA-'].update("{:02d}:{:02d} / {:02d}:{:02d}".format(*divmod(player.get_time()//1000, 60),*divmod(player.get_length()//1000, 60)))
+  else:
+    window['-MESSAGE_AREA-'].update('Load media to start' if media_list.count() == 0 else 'Ready to play media' )
+ 
+  #cap = cv.VideoCapture(r"C:\Medal\Clips\League of Legends\MedalTVLeagueofLegends20230417154836.mp4")
+  #if (cap.isOpened()== False): 
+  #  print("didn't open")
+  #  break
+  #else:
+  #   print('opened')
 
-      # update elapsed time if there is a video loaded and the player is playing
-    if player.is_playing():
-        window['-MESSAGE_AREA-'].update("{:02d}:{:02d} / {:02d}:{:02d}".format(*divmod(player.get_time()//1000, 60),*divmod(player.get_length()//1000, 60)))
-    else:
-        window['-MESSAGE_AREA-'].update('Load media to start' if media_list.count() == 0 else 'Ready to play media' )
-
-  
+  if event == psg.WIN_CLOSED or event == 'Exit':
+    break
 window.close()
